@@ -16,7 +16,7 @@ wget https://getcomposer.org/installer -O - -q | php -- --quiet
 mv composer.phar /usr/local/bin/composer
 
 mkdir $BUILD_DIR/server
-wget --progress=dot:giga https://github.com/kimai/kimai/archive/refs/tags/2.40.0.tar.gz -O kimai.tar.gz
+wget --progress=dot:giga https://github.com/kimai/kimai/archive/refs/tags/$VERSION.tar.gz -O kimai.tar.gz
 tar xf kimai.tar.gz --strip-components=1 -C $BUILD_DIR/server
 
 cd $BUILD_DIR/server

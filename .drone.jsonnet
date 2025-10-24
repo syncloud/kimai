@@ -1,4 +1,5 @@
 local name = 'kimai';
+lical version = '2.40.0';
 local node = '22.16.0';
 local php = '8.3.9-fpm-bullseye';
 local nginx = '1.24.0';
