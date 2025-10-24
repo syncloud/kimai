@@ -7,6 +7,7 @@ local php = '8.3.9-fpm-bullseye';
 local nginx = '1.24.0';
 local redis = '7.0.15';
 local mariadb = '10.5.16-alpine';
+local debian = 'bookworm-slim';
 local browser = 'chrome';
 local platform = '25.02';
 local selenium = '4.21.0-20240517';
@@ -27,30 +28,9 @@ local build(arch, test_ui, dind) = [
   steps: [
            {
              name: 'version',
-             image: 'debian:buster-slim',
+             image: "debian:" + debian,
              commands: [
                'echo $DRONE_BUILD_NUMBER > version',
-             ],
-           },
-           {
-             name: 'chromium',
-             image: 'mcr.microsoft.com/playwright:v1.49.1',
-             commands: [
-               './chromium/build.sh',
-             ],
-           },
-           {
-             name: 'chromium test',
-             image: 'syncloud/platform-buster-' + arch + ':' + platform,
-             commands: [
-               './chromium/test.sh',
-             ],
-           },
-           {
-             name: 'chromium pdf',
-             image: 'debian:bullseye-slim',
-             commands: [
-               './chromium/test-pdf.sh',
              ],
            },
            {
@@ -60,32 +40,13 @@ local build(arch, test_ui, dind) = [
                './php/build.sh',
                './php/build-server.sh ' + version,
              ],
-             environment: {
-               GITHUB_TOKEN: {
-                 from_secret: 'GITHUB_TOKEN',
-               },
-             },
            },
            {
              name: 'php test',
-             image: 'syncloud/platform-buster-' + arch + ':' + platform,
+             image: 'syncloud/platform-' + distro_default + '-' + arch + ':' + platform,
              commands: [
                './php/test.sh',
                './php/test-server.sh',
-             ],
-           },
-           {
-             name: 'redis',
-             image: 'redis:' + redis,
-             commands: [
-               './redis/build.sh',
-             ],
-           },
-           {
-             name: 'redis test',
-             image: 'syncloud/platform-buster-' + arch + ':' + platform,
-             commands: [
-               './redis/test.sh',
              ],
            },
            {
@@ -97,7 +58,7 @@ local build(arch, test_ui, dind) = [
            },
            {
              name: 'nginx test',
-             image: 'syncloud/platform-buster-' + arch + ':' + platform,
+             image: 'syncloud/platform-' + distro_default + '-' + arch + ':' + platform,
              commands: [
                './nginx/test.sh',
              ],
@@ -111,7 +72,7 @@ local build(arch, test_ui, dind) = [
            },
            {
              name: 'mariadb test',
-             image: 'syncloud/platform-buster-' + arch + ':' + platform,
+             image: 'syncloud/platform-' + distro_default + '-' + arch + ':' + platform,
              commands: [
                './mariadb/test.sh',
              ],
@@ -123,21 +84,21 @@ local build(arch, test_ui, dind) = [
                './web/build.sh ' + ui_version,
              ],
            },
-           {
+          {
              name: 'cli',
-             image: 'golang:1.20',
+             image: 'golang:1.23',
              commands: [
                'cd cli',
-               "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/install ./cmd/install",
-               "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/configure ./cmd/configure",
-               "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/pre-refresh ./cmd/pre-refresh",
-               "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/post-refresh ./cmd/post-refresh",
-               "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/bin/cli ./cmd/cli",
+               'CGO_ENABLED=0 go build -o ../build/snap/meta/hooks/install ./cmd/install',
+               'CGO_ENABLED=0 go build -o ../build/snap/meta/hooks/configure ./cmd/configure',
+               'CGO_ENABLED=0 go build -o ../build/snap/meta/hooks/pre-refresh ./cmd/pre-refresh',
+               'CGO_ENABLED=0 go build -o ../build/snap/meta/hooks/post-refresh ./cmd/post-refresh',
+               'CGO_ENABLED=0 go build -o ../build/snap/bin/cli ./cmd/cli',
              ],
            },
            {
              name: 'package',
-             image: 'debian:buster-slim',
+             image: "debian:" + debian,
              commands: [
                'VERSION=$(cat version)',
                './package.sh ' + name + ' $VERSION ',
@@ -148,10 +109,9 @@ local build(arch, test_ui, dind) = [
              name: 'test ' + distro,
              image: 'python:' + python,
              commands: [
-               'APP_ARCHIVE_PATH=$(realpath $(cat package.name))',
                'cd test',
                './deps.sh',
-               'py.test -x -s test.py --distro=' + distro + ' --domain=' + distro + '.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=' + name + '.' + distro + '.com --app=' + name + ' --arch=' + arch,
+                'py.test -x -s test.py --distro=' + distro + ' --ver=$DRONE_BUILD_NUMBER --app=' + name,
              ],
            }
            for distro in distros
@@ -204,7 +164,7 @@ local build(arch, test_ui, dind) = [
                     commands: [
                       'cd test',
                       './deps.sh',
-                      'py.test -x -s ui.py --distro=buster --ui-mode=desktop --domain=' + distro_default + '.com --device-host=' + name + '.' + distro_default + '.com --app=' + name + ' --browser-height=2000 --browser=' + browser,
+                       'py.test -x -s ui.py --distro=' + distro_default + ' --ver=$DRONE_BUILD_NUMBER --app=' + name + ' --browser=' + browser,
                     ],
                     volumes: [{
                       name: 'videos',
@@ -219,10 +179,9 @@ local build(arch, test_ui, dind) = [
               name: 'test-upgrade',
               image: 'python:' + python,
               commands: [
-                'APP_ARCHIVE_PATH=$(realpath $(cat package.name))',
                 'cd test',
                 './deps.sh',
-                'py.test -x -s upgrade.py --distro=buster --ui-mode=desktop --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=' + name + '.buster.com --app=' + name + ' --browser=' + browser,
+                 'py.test -x -s upgrade.py --distro=' + distro_default + ' --ver=$DRONE_BUILD_NUMBER --app=' + name + ' --browser=' + browser,
               ],
               privileged: true,
               volumes: [{
@@ -233,7 +192,7 @@ local build(arch, test_ui, dind) = [
           ] else []) + [
     {
       name: 'upload',
-      image: 'debian:buster-slim',
+      image: "debian:" + debian,
       environment: {
         AWS_ACCESS_KEY_ID: {
           from_secret: 'AWS_ACCESS_KEY_ID',
@@ -259,7 +218,7 @@ local build(arch, test_ui, dind) = [
     },
     {
       name: 'promote',
-      image: 'debian:buster-slim',
+      image: "debian:" + debian,
       environment: {
         AWS_ACCESS_KEY_ID: {
           from_secret: 'AWS_ACCESS_KEY_ID',
