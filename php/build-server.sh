@@ -20,6 +20,7 @@ wget --progress=dot:giga https://github.com/kimai/kimai/archive/refs/tags/$VERSI
 tar xf kimai.tar.gz --strip-components=1 -C $BUILD_DIR/server
 
 cd $BUILD_DIR/server
+export COMPOSER_MEMORY_LIMIT=-1
 #composer config --global github-oauth.github.com $GITHUB_TOKEN
 composer install --no-dev
 
