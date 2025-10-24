@@ -1,7 +1,4 @@
 local name = 'kimai';
-local version = '5.11';
-#local ui_version = '23.05.2025.1';
-local ui_version = 'fork';
 local node = '22.16.0';
 local php = '8.3.9-fpm-bullseye';
 local nginx = '1.24.0';
@@ -9,12 +6,12 @@ local redis = '7.0.15';
 local mariadb = '10.5.16-alpine';
 local debian = 'bookworm-slim';
 local browser = 'chrome';
-local platform = '25.02';
-local selenium = '4.21.0-20240517';
+local platform = '25.09';
+local selenium = '4.35.0-20250828';
 local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
-local python = '3.9-slim-buster';
-local distro_default = 'buster';
-local distros = ['bookworm', 'buster'];
+local python = '3.12-slim-bookworm';
+local distro_default = 'bookworm';
+local distros = ['bookworm'];
 
 local build(arch, test_ui, dind) = [
 {
