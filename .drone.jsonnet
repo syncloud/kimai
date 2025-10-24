@@ -76,13 +76,6 @@ local build(arch, test_ui, dind) = [
              ],
            },
            {
-             name: 'web',
-             image: 'node:' + node,
-             commands: [
-               './web/build.sh ' + ui_version,
-             ],
-           },
-          {
              name: 'cli',
              image: 'golang:1.23',
              commands: [
