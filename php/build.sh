@@ -27,7 +27,8 @@ apt-get install -y \
 		libtiff5-dev \
 		libwebp-dev \
 		libmemcached-dev \
-    libmcrypt-dev \
+ libmcrypt-dev \
+  libxslt1-dev \
 		zip \
 		wget \
 		unzip \
@@ -80,6 +81,8 @@ docker-php-ext-install zip
 docker-php-ext-install pcntl
 docker-php-ext-install exif
 docker-php-ext-install sysvsem
+docker-php-ext-install xsl
+
 #RUN docker-php-ext-enable imagick
 
 docker-php-ext-enable smbclient
