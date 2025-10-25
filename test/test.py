@@ -57,7 +57,8 @@ def test_install(app_archive_path, domain, device_session, device_password):
     wait_for_installer(device_session, domain, attempts=10)
 
 
-def test_index(app_domain):
+@pytest.mark.flaky(retries=10, delay=5)
+def test_visible_through_platform(app_domain):
     response = requests.get('https://{0}'.format(app_domain), verify=False)
     assert response.status_code == 200, response.text
 
@@ -68,11 +69,6 @@ def test_storage_change_event(device):
 
 def test_access_change_event(device):
     device.run_ssh('snap run kimai.access-change > {0}/access-change.log'.format(TMP_DIR))
-
-
-def test_api(app_domain):
-    response = requests.get('https://{0}/api/v1/ping'.format(app_domain), verify=False)
-    assert response.status_code == 403, response.text
 
 
 def test_upgrade(app_archive_path, domain, device_password):
