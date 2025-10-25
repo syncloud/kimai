@@ -9,7 +9,6 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"path"
-	"strings"
 )
 
 const App = "kimai"
@@ -38,7 +37,6 @@ type Installer struct {
 	appDir             string
 	dataDir            string
 	commonDir          string
-	artisanPath        string
 	executor           *Executor
 	logger             *zap.Logger
 }
@@ -49,7 +47,6 @@ func New(logger *zap.Logger) *Installer {
 	commonDir := fmt.Sprintf("/var/snap/%s/common", App)
 	configDir := path.Join(dataDir, "config")
 	executor := NewExecutor(logger)
-	artisanPath := path.Join(appDir, "/bin/artisan.sh")
 	return &Installer{
 		newVersionFile:     path.Join(appDir, "version"),
 		currentVersionFile: path.Join(dataDir, "version"),
@@ -61,13 +58,12 @@ func New(logger *zap.Logger) *Installer {
 		dataDir:            dataDir,
 		commonDir:          commonDir,
 		executor:           executor,
-		artisanPath:        artisanPath,
 		logger:             logger,
 	}
 }
 
 func (i *Installer) Install() error {
-	err := CreateUser(App)
+	err := linux.CreateUser(App)
 	if err != nil {
 		return err
 	}
@@ -105,19 +101,6 @@ func (i *Installer) Configure() error {
 		if err != nil {
 			return err
 		}
-	}
-
-	_, err := i.executor.Run(i.artisanPath, "migrate", "--force")
-	if err != nil {
-		return err
-	}
-	_, err = i.executor.Run(i.artisanPath, "db:seed", "--force")
-	if err != nil {
-		return err
-	}
-	_, err = i.executor.Run(i.artisanPath, "cache:clear")
-	if err != nil {
-		return err
 	}
 
 	return i.UpdateVersion()
@@ -200,7 +183,7 @@ func (i *Installer) StorageChange() error {
 		return err
 	}
 
-	err = Chown(storageDir, App)
+	err = linux.Chown(storageDir, App)
 	if err != nil {
 		return err
 	}
@@ -226,15 +209,11 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
-	err = Chown(i.dataDir, App)
+	err = linux.Chown(i.dataDir, App)
 	if err != nil {
 		return err
 	}
 
-	appKey, err := i.getOrCreateAppKey()
-	if err != nil {
-		return err
-	}
 	appUrl, err := i.platformClient.GetAppUrl(App)
 	if err != nil {
 		return err
@@ -259,7 +238,6 @@ func (i *Installer) UpdateConfigs() error {
 		AppDir:           i.appDir,
 		DataDir:          i.dataDir,
 		CommonDir:        i.commonDir,
-		AppKey:           appKey,
 		AppUrl:           appUrl,
 		Domain:           domain,
 		AuthUrl:          authUrl,
@@ -297,31 +275,14 @@ func (i *Installer) AccessChange() error {
 }
 
 func (i *Installer) FixPermissions() error {
-	err := Chown(i.dataDir, App)
+	err := linux.Chown(i.dataDir, App)
 	if err != nil {
 		return err
 	}
-	err = Chown(i.commonDir, App)
+	err = linux.Chown(i.commonDir, App)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (i *Installer) getOrCreateAppKey() (string, error) {
-	file := path.Join(i.dataDir, ".app_key")
-	_, err := os.Stat(file)
-	if os.IsNotExist(err) {
-		secret, err := i.executor.Run(i.artisanPath, "key:generate", "--show")
-		if err != nil {
-			return "", err
-		}
-		err = os.WriteFile(file, []byte(strings.TrimSpace(secret)), 0644)
-		return secret, err
-	}
-	content, err := os.ReadFile(file)
-	if err != nil {
-		return "", err
-	}
-	return string(content), nil
-}
