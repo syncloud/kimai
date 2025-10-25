@@ -21,9 +21,11 @@ tar xf kimai.tar.gz --strip-components=1 -C $BUILD_DIR/server
 
 cd $BUILD_DIR/server
 export COMPOSER_MEMORY_LIMIT=-1
-#composer config --global github-oauth.github.com $GITHUB_TOKEN
-composer install --no-dev
 
+composer --no-ansi install --no-dev --optimize-autoloader
+composer --no-ansi clearcache
+composer --no-ansi require --update-no-dev laminas/laminas-ldap
+ 
 SNAP=/snap/kimai/current
 SNAP_DATA=/var$SNAP
 mkdir -p bin
