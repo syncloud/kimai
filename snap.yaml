@@ -10,36 +10,6 @@ apps:
     start-timeout: 600s
     restart-condition: always
 
-  worker-1:
-    user: kimai
-    command: bin/service.worker.sh
-    daemon: simple
-    plugs:
-    - network
-    - network-bind
-    start-timeout: 600s
-    restart-condition: always
-
-  worker-2:
-    user: kimai
-    command: bin/service.worker.sh
-    daemon: simple
-    plugs:
-    - network
-    - network-bind
-    start-timeout: 600s
-    restart-condition: always
-
-  scheduler:
-    user: kimai
-    command: bin/service.scheduler.sh
-    daemon: simple
-    plugs:
-    - network
-    - network-bind
-    start-timeout: 600s
-    restart-condition: always
-
   mariadb:
     user: kimai
     command: bin/service.mariadb.sh
@@ -47,12 +17,6 @@ apps:
     plugs:
     - network
     - network-bind
-    restart-condition: always
-
-  redis:
-    user: kimai
-    daemon: simple
-    command: bin/service.redis.sh
     restart-condition: always
 
   nginx:
