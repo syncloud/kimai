@@ -35,6 +35,9 @@ apps:
   sql:
     command: bin/mysql
 
+  php:
+    command: bin/php.sh
+
   storage-change:
     command: bin/cli storage-change
 

@@ -57,6 +57,10 @@ def test_install(app_archive_path, domain, device_session, device_password):
     wait_for_installer(device_session, domain, attempts=10)
 
 
+def test_php(device):
+    device.run_ssh('snap run kimai.php --info > {0}/php.log'.format(TMP_DIR))
+
+
 @pytest.mark.flaky(retries=10, delay=5)
 def test_visible_through_platform(app_domain):
     response = requests.get('https://{0}'.format(app_domain), verify=False)
