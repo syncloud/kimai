@@ -17,5 +17,5 @@ mkdir -p framework/{sessions,views,cache}
 
 #$TEST_DIR/bin/artisan.sh key:generate --show
 
-export PATH=$PATH:$BUILD_DIR/../php/bin
-$BUILD_DIR/../php/bin/php.sh -c $TEST_CONFIG_DIR/php.ini artisan key:generate --show
+#export PATH=$PATH:$BUILD_DIR/../php/bin
+#$BUILD_DIR/../php/bin/php.sh -c $TEST_CONFIG_DIR/php.ini artisan key:generate --show
