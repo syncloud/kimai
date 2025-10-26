@@ -36,6 +36,13 @@ cp -r $DIR/bin/* bin
 rm -rf .env
 ln -s $SNAP_DATA/config/.env .env
 ln -s $SNAP_DATA/config/local.yaml config/packages/local.yaml
-cp config/packages/monolog.yaml config/packages/monolog.yaml.dist
+
+mv config/packages/monolog.yaml config/packages/monolog.yaml.dist
 ln -s $SNAP_DATA/config/monolog.yaml config/packages/monolog.yaml
+
+rm -rf var/cache
+ln -s $SNAP_DATA/cache var/cache
+
+rm -rf var/plugins
+ln -s $SNAP_DATA/plugins var/plugins
 

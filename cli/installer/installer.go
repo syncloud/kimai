@@ -208,6 +208,8 @@ func (i *Installer) UpdateConfigs() error {
 	err := linux.CreateMissingDirs(
 		path.Join(i.dataDir, "nginx"),
 		path.Join(i.dataDir, "data"),
+		path.Join(i.dataDir, "cache"),
+		path.Join(i.dataDir, "plugins"),
 	)
 	if err != nil {
 		return err
