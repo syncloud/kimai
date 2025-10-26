@@ -14,13 +14,13 @@ import (
 const App = "kimai"
 
 type Variables struct {
-	App              string
-	AppDir           string
-	DataDir          string
-	CommonDir        string
-	AppKey           string
-	AppUrl           string
-	Domain           string
+	App       string
+	AppDir    string
+	DataDir   string
+	CommonDir string
+	AppKey    string
+	AppUrl    string
+	Domain    string
 }
 
 type Installer struct {
@@ -33,6 +33,7 @@ type Installer struct {
 	appDir             string
 	dataDir            string
 	commonDir          string
+	consolePath        string
 	executor           *Executor
 	logger             *zap.Logger
 }
@@ -43,6 +44,8 @@ func New(logger *zap.Logger) *Installer {
 	commonDir := fmt.Sprintf("/var/snap/%s/common", App)
 	configDir := path.Join(dataDir, "config")
 	executor := NewExecutor(logger)
+	consolePath := path.Join(appDir, "/bin/console.sh")
+
 	return &Installer{
 		newVersionFile:     path.Join(appDir, "version"),
 		currentVersionFile: path.Join(dataDir, "version"),
@@ -54,6 +57,7 @@ func New(logger *zap.Logger) *Installer {
 		dataDir:            dataDir,
 		commonDir:          commonDir,
 		executor:           executor,
+		consolePath:        consolePath,
 		logger:             logger,
 	}
 }
@@ -97,6 +101,12 @@ func (i *Installer) Configure() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	output, err := i.executor.Run(i.consolePath, "kimai:install")
+	if err != nil {
+		i.logger.Info(output)
+		return err
 	}
 
 	return i.UpdateVersion()
@@ -217,15 +227,14 @@ func (i *Installer) UpdateConfigs() error {
 	if err != nil {
 		return err
 	}
-	
 
 	variables := Variables{
-		App:              App,
-		AppDir:           i.appDir,
-		DataDir:          i.dataDir,
-		CommonDir:        i.commonDir,
-		AppUrl:           appUrl,
-		Domain:           domain,
+		App:       App,
+		AppDir:    i.appDir,
+		DataDir:   i.dataDir,
+		CommonDir: i.commonDir,
+		AppUrl:    appUrl,
+		Domain:    domain,
 	}
 
 	err = config.Generate(
@@ -267,4 +276,3 @@ func (i *Installer) FixPermissions() error {
 	}
 	return nil
 }
-
