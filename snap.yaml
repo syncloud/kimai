@@ -38,6 +38,9 @@ apps:
   php:
     command: bin/php.sh
 
+  console:
+    command: bin/console.sh
+
   storage-change:
     command: bin/cli storage-change
 

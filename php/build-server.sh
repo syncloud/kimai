@@ -31,6 +31,11 @@ SNAP_DATA=/var$SNAP
 mkdir -p bin
 cp -r $DIR/bin/* bin
 
+#sed -i 's###g' bin/console
+
 rm -rf .env
 ln -s $SNAP_DATA/config/.env .env
 ln -s $SNAP_DATA/config/local.yaml config/packages/local.yaml
+cp config/packages/monolog.yaml config/packages/monolog.yaml.dist
+ln -s $SNAP_DATA/config/monolog.yaml config/packages/monolog.yaml
+
