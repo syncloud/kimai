@@ -210,6 +210,7 @@ func (i *Installer) UpdateConfigs() error {
 		path.Join(i.dataDir, "data"),
 		path.Join(i.dataDir, "cache"),
 		path.Join(i.dataDir, "plugins"),
+		path.Join(i.dataDir, "log"),
 	)
 	if err != nil {
 		return err

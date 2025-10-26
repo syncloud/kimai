@@ -46,3 +46,5 @@ ln -s $SNAP_DATA/cache var/cache
 rm -rf var/plugins
 ln -s $SNAP_DATA/plugins var/plugins
 
+rm -rf var/log
+ln -s $SNAP_DATA/log var/log
