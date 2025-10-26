@@ -21,10 +21,6 @@ type Variables struct {
 	AppKey           string
 	AppUrl           string
 	Domain           string
-	AuthUrl          string
-	AuthClientId     string
-	AuthClientSecret string
-	AuthRedirectUri  string
 }
 
 type Installer struct {
@@ -201,9 +197,7 @@ func (i *Installer) UpdateVersion() error {
 func (i *Installer) UpdateConfigs() error {
 	err := linux.CreateMissingDirs(
 		path.Join(i.dataDir, "nginx"),
-		path.Join(i.dataDir, "storage/framework/sessions"),
-		path.Join(i.dataDir, "storage/framework/views"),
-		path.Join(i.dataDir, "storage/framework/cache"),
+		path.Join(i.dataDir, "data"),
 	)
 	if err != nil {
 		return err
@@ -223,15 +217,7 @@ func (i *Installer) UpdateConfigs() error {
 	if err != nil {
 		return err
 	}
-	authUrl, err := i.platformClient.GetAppUrl("auth")
-	if err != nil {
-		return err
-	}
-	redirectUri := "/auth/authelia"
-	password, err := i.platformClient.RegisterOIDCClient(App, redirectUri, false, "client_secret_post")
-	if err != nil {
-		return err
-	}
+	
 
 	variables := Variables{
 		App:              App,
@@ -240,10 +226,6 @@ func (i *Installer) UpdateConfigs() error {
 		CommonDir:        i.commonDir,
 		AppUrl:           appUrl,
 		Domain:           domain,
-		AuthUrl:          authUrl,
-		AuthClientId:     App,
-		AuthClientSecret: password,
-		AuthRedirectUri:  redirectUri,
 	}
 
 	err = config.Generate(
