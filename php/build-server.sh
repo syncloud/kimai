@@ -33,3 +33,4 @@ cp -r $DIR/bin/* bin
 
 rm -rf .env
 ln -s $SNAP_DATA/config/.env .env
+ln -s $SNAP_DATA/config/local.yaml config/packages/local.yaml
