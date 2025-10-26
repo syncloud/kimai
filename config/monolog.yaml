@@ -15,6 +15,3 @@ monolog:
             type: console
             process_psr_3_messages: false
             level: error
-        deprecation:
-            type: console
-            channels: [deprecation]
