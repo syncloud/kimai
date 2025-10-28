@@ -103,12 +103,6 @@ func (i *Installer) Configure() error {
 		}
 	}
 
-	output, err := i.executor.Run(i.consolePath, "kimai:install")
-	if err != nil {
-		i.logger.Info(output)
-		return err
-	}
-
 	return i.UpdateVersion()
 }
 
@@ -120,6 +114,12 @@ func (i *Installer) Initialize() error {
 
 	err = i.database.createDb()
 	if err != nil {
+		return err
+	}
+
+	output, err := i.executor.Run(i.consolePath, "kimai:install")
+	if err != nil {
+		i.logger.Info(output)
 		return err
 	}
 
@@ -142,6 +142,12 @@ func (i *Installer) Upgrade() error {
 	}
 	err = i.StorageChange()
 	if err != nil {
+		return err
+	}
+
+	output, err := i.executor.Run(i.consolePath, "kimai:update")
+	if err != nil {
+		i.logger.Info(output)
 		return err
 	}
 
