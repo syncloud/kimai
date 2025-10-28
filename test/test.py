@@ -24,6 +24,7 @@ def module_setup(request, device, data_dir, platform_data_dir, app_dir, artifact
         device.run_ssh('netstat -nlp > {0}/netstat.log'.format(TMP_DIR), throw=False)
         device.run_ssh('journalctl > {0}/journalctl.log'.format(TMP_DIR), throw=False)
         device.run_ssh('cp -r /var/snap/kimai/current/config {0}/config.current'.format(TMP_DIR), throw=False)
+        device.run_ssh('cp -r /var/snap/kimai/current/config/.* {0}/config.current'.format(TMP_DIR), throw=False)
         device.run_ssh('cp -r /snap/kimai/current/config {0}/config.app'.format(TMP_DIR), throw=False)
         device.run_ssh('cp -r /snap/kimai/current/kimai/usr/local/etc/ {0}/usr.local.etc'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la /snap > {0}/snap.ls.log'.format(TMP_DIR), throw=False)
