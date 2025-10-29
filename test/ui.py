@@ -44,9 +44,11 @@ def test_login_new(selenium, device_user, device_password):
 
 def test_welcome(selenium):
     selenium.find_by(By.XPATH, "//a[.='Next']").click()
+    selenium.screenshot('welcome')
     selenium.find_by(By.XPATH, "//h1[.='Your profile']")
     selenium.find_by(By.XPATH, "//button[.='Next']").click()
-    selenium.screenshot('welcome')
+    selenium.find_by(By.XPATH, "//h1[.='Congratulations']")
+    selenium.find_by(By.XPATH, "//a[.='Next']").click()
 
 
 def test_default_company(selenium):
@@ -54,6 +56,7 @@ def test_default_company(selenium):
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
     selenium.invisible_by(By.XPATH, "//h3[.='Welcome to Invoice Ninja']")
     selenium.screenshot('main')
+
 
 def test_settings(selenium):
     selenium.click_by(By.XPATH, "//span[.='Settings']")
