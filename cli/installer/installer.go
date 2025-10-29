@@ -164,6 +164,9 @@ func (i *Installer) PreRefresh() error {
 }
 
 func (i *Installer) PostRefresh() error {
+
+	_ = os.RemoveAll(path.Join(i.dataDir, "cache"))
+
 	err := i.UpdateConfigs()
 	if err != nil {
 		return err
