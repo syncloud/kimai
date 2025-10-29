@@ -35,10 +35,10 @@ def test_start(module_setup, app, domain, device_host):
 
 def test_login_new(selenium, device_user, device_password):
     selenium.open_app()
-    selenium.find_by(By.NAME, "username").send_keys(device_user)
+    selenium.find_by(By.ID, "username").send_keys(device_user)
     password = selenium.find_by(By.ID, "password")
     password.send_keys(device_password)
-    selenium.find_by(By.XPATH, "//button[contains(.,'Login')]").click()
+    selenium.find_by(By.XPATH, "//button[contains(.,'Log in')]").click()
     selenium.screenshot('login')
 
 def test_default_company(selenium):
@@ -101,3 +101,4 @@ def test_new_company(selenium):
     selenium.find_by(By.XPATH, "//h3[.='Welcome to Invoice Ninja']/../../..//button[.='Save']").click()
     selenium.invisible_by(By.XPATH, "//h3[.='Welcome to Invoice Ninja']")
     selenium.screenshot('new-company-saved')
+
