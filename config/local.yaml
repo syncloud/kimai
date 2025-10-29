@@ -56,7 +56,7 @@ kimai:
             #     accountFilterFormat = (&(objectClass=posixAccount))(&(usernameAttribute=%s))
             #
             # %filter% is the "filter" configuration defined below in the "user" section
-            accountFilterFormat: (&(objectClass=inetOrgPerson)(uid=%s))
+            accountFilterFormat: (&(objectClass=inetOrgPerson)(cn=%s))
             
             # If true, this instructs Kimai to retrieve the DN for the account, 
             # used to bind if the username is not already in DN form. 
@@ -155,6 +155,7 @@ kimai:
             groups:
             #    - { ldap_value: group1, role: ROLE_TEAMLEAD }
                 - { ldap_value: syncloud, role: ROLE_ADMIN }
+
 
 
 
