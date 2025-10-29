@@ -1,7 +1,6 @@
 import pytest
 from os.path import dirname, join
 
-from retry import retry
 from selenium.webdriver.common.by import By
 from subprocess import check_output
 from syncloudlib.integration.hosts import add_host_alias
