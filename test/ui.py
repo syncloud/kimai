@@ -41,6 +41,12 @@ def test_login_new(selenium, device_user, device_password):
     selenium.find_by(By.XPATH, "//button[contains(.,'Log in')]").click()
     selenium.screenshot('login')
 
+
+def test_welcome(selenium):
+    selenium.find_by(By.XPATH, "//a[.='Next']").click()
+    selenium.screenshot('welcome')
+
+
 def test_default_company(selenium):
     selenium.find_by(By.XPATH, "//label[contains(.,'Company Name')]/..//input").send_keys("Test Company")
     selenium.find_by(By.XPATH, "//button[.='Save']").click()

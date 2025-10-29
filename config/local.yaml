@@ -137,7 +137,7 @@ kimai:
             # The attribute must be given in lowercase!
             # The example below uses "posix group style memberUid". 
             # default: dn
-            #usernameAttribute: uid 
+            usernameAttribute: uid 
             
             # Field that holds the group name, which will be used to map the 
             # LDAP groups with Kimai roles (see groups mapping below).
@@ -155,4 +155,5 @@ kimai:
             groups:
             #    - { ldap_value: group1, role: ROLE_TEAMLEAD }
                 - { ldap_value: syncloud, role: ROLE_ADMIN }
+
 
