@@ -85,7 +85,7 @@ kimai:
             # Otherwise a search is executed to find the users "dn" by finding the user
             # via this attribute with his "baseDn" and the "filter" below. 
             # default: uid 
-            usernameAttribute: uid
+            usernameAttribute: cn
             
             # LDAP search base filter to find the user / the users DN.
             # Do NOT include the rule (&(usernameAttribute=%s)), it will be appended
@@ -137,7 +137,7 @@ kimai:
             # The attribute must be given in lowercase!
             # The example below uses "posix group style memberUid". 
             # default: dn
-            usernameAttribute: uid 
+            usernameAttribute: cn
             
             # Field that holds the group name, which will be used to map the 
             # LDAP groups with Kimai roles (see groups mapping below).
@@ -155,5 +155,8 @@ kimai:
             groups:
             #    - { ldap_value: group1, role: ROLE_TEAMLEAD }
                 - { ldap_value: syncloud, role: ROLE_ADMIN }
+
+
+
 
 
