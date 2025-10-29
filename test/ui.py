@@ -45,7 +45,7 @@ def test_login_new(selenium, device_user, device_password):
 def test_welcome(selenium):
     selenium.find_by(By.XPATH, "//a[.='Next']").click()
     selenium.find_by(By.XPATH, "//h1[.='Your profile']")
-    selenium.find_by(By.XPATH, "//a[.='Next']").click()
+    selenium.find_by(By.XPATH, "//button[.='Next']").click()
     selenium.screenshot('welcome')
 
 
