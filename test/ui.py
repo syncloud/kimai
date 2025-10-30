@@ -51,8 +51,12 @@ def test_welcome(selenium):
     selenium.find_by(By.XPATH, "//a[.='Next']").click()
 
 
-def test_teams(selenium, device_user):
+def test_administration(selenium, device_user):
     selenium.find_by(By.CLASS_NAME, "navbar-menu-system").click()
+    selenium.screenshot('administration')
+
+
+def test_teams(selenium, device_user):
     selenium.find_by(By.CLASS_NAME, "navbar-menu-teams").click()
     selenium.find_by(By.XPATH, "//a[.='Create']").click()
     selenium.find_by(By.ID, "team_edit_form_name").send_keys("team")
@@ -65,7 +69,6 @@ def test_teams(selenium, device_user):
 
 
 def test_customers(selenium):
-    selenium.click_by(By.XPATH, "//span[.='Administration']")
     selenium.click_by(By.XPATH, "//a[contains(.,'Customers')]")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "customer_edit_form_name").send_keys("customer")
@@ -75,7 +78,6 @@ def test_customers(selenium):
 
 
 def test_projects(selenium):
-    selenium.click_by(By.XPATH, "//span[.='Administration']")
     selenium.click_by(By.XPATH, "//a[contains(.,'Projects')]")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "project_edit_form_name").send_keys("project")
@@ -86,7 +88,6 @@ def test_projects(selenium):
     selenium.screenshot('projects')
 
 def test_activities(selenium):
-    selenium.click_by(By.XPATH, "//span[.='Administration']")
     selenium.click_by(By.XPATH, "//a[contains(.,'Activities')]")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "activity_edit_form_name").send_keys("activity")
