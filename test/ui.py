@@ -51,12 +51,8 @@ def test_welcome(selenium):
     selenium.find_by(By.XPATH, "//a[.='Next']").click()
 
 
-def test_administration(selenium, device_user):
-    selenium.find_by(By.CLASS_NAME, "navbar-menu-system").click()
-    selenium.screenshot('administration')
-
-
 def test_teams(selenium, device_user):
+    selenium.find_by(By.CLASS_NAME, "navbar-menu-system").click()
     selenium.find_by(By.CLASS_NAME, "navbar-menu-teams").click()
     selenium.find_by(By.XPATH, "//a[.='Create']").click()
     selenium.find_by(By.ID, "team_edit_form_name").send_keys("team")
@@ -66,6 +62,11 @@ def test_teams(selenium, device_user):
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
     selenium.invisible_by(By.XPATH, "//h5[.=Create]")
     selenium.screenshot('teams')
+
+
+def test_administration(selenium, device_user)
+    selenium.click_by(By.XPATH, "//span[.='Administration']")
+    selenium.screenshot('administration')
 
 
 def test_customers(selenium):
