@@ -2,7 +2,7 @@ monolog:
     handlers:
         main:
             type: fingers_crossed
-            action_level: error
+            action_level: info
             handler: console
             excluded_http_codes:
                 - {400: ['^/api/']}
@@ -14,4 +14,4 @@ monolog:
         console:
             type: console
             process_psr_3_messages: false
-            level: error
+            level: info
