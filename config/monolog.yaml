@@ -2,8 +2,7 @@ monolog:
     handlers:
         main:
             type: fingers_crossed
-            action_level: info
-            handler: console
+            handler: syslog_handler
             excluded_http_codes:
                 - {400: ['^/api/']}
                 - {401: ['^/api/']}
@@ -11,6 +10,9 @@ monolog:
                 - 404
                 - {405: ['/homepage$', '/login_check$', '/export/data$']}
             channels: ["!deprecation"]
+        syslog_handler:
+            type: syslog
+            level: debug
         console:
             type: console
             process_psr_3_messages: false
