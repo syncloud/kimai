@@ -103,6 +103,11 @@ func (i *Installer) Configure() error {
 		}
 	}
 
+	err := i.FixPermissions()
+	if err != nil {
+		return err
+	}
+
 	return i.UpdateVersion()
 }
 
