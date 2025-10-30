@@ -78,6 +78,11 @@ func (i *Installer) Install() error {
 		return err
 	}
 
+	err = i.FixPermissions()
+	if err != nil {
+		return err
+	}
+
 	err = i.StorageChange()
 	if err != nil {
 		return err
@@ -96,10 +101,6 @@ func (i *Installer) Configure() error {
 		if err != nil {
 			return err
 		}
-	}
-	err := i.FixPermissions()
-	if err != nil {
-		return err
 	}
 
 	return i.UpdateVersion()
