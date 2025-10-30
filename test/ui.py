@@ -51,65 +51,48 @@ def test_welcome(selenium):
     selenium.find_by(By.XPATH, "//a[.='Next']").click()
 
 
-def test_default_company(selenium):
-    selenium.find_by(By.XPATH, "//label[contains(.,'Company Name')]/..//input").send_keys("Test Company")
+def test_teams(selenium, device_user):
+    selenium.find_by(By.CLASS_NAME, "navbar-menu-system").click()
+    selenium.find_by(By.CLASS_NAME, "navbar-menu-teams").click()
+    selenium.find_by(By.XPATH, "//a[.='Create']").click()
+    selenium.find_by(By.ID, "team_edit_form_name").send_keys("team")
+    selenium.find_by(By.XPATH, '//label[.="Add user"]/..//div[contains(@class, "selectpicker")]').click()
+    selenium.find_by(By.XPATH, f'//div[contains(@class, "list-group-item") and contains(., "{device_user}")]').click()
+    selenium.find_by(By.CLASS_NAME, 'form-selectgroup-check').click()
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
-    selenium.invisible_by(By.XPATH, "//h3[.='Welcome to Invoice Ninja']")
-    selenium.screenshot('main')
+    selenium.invisible_by(By.XPATH, "//h5[.=Create]")
+    selenium.screenshot('teams')
 
 
-def test_settings(selenium):
-    selenium.click_by(By.XPATH, "//span[.='Settings']")
-    selenium.find_by(By.XPATH, "//span[.='Basic Settings']")
-
-
-def test_new_client(selenium):
-    selenium.click_by(By.XPATH, "//a[@href='/clients/create']")
-    selenium.click_by(By.XPATH, "//a[@href='/clients/create']")
-    selenium.find_by(By.XPATH, "//span[.='Name']/../..//input").send_keys("Client")
+def test_customers(selenium):
+    selenium.click_by(By.XPATH, "//span[.='Administration']")
+    selenium.click_by(By.XPATH, "//a[contains(.,'Customers')]")
+    selenium.click_by(By.XPATH, "//a[.='Create']")
+    selenium.find_by(By.ID, "customer_edit_form_name").send_keys("customer")
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
-    selenium.find_by(By.XPATH, "//h2[.='Client']")
-    selenium.screenshot('client')
+    selenium.find_by(By.XPATH, "//span[contains(.,'customer')]")
+    selenium.screenshot('customers')
 
-def test_new_product(selenium):
-    selenium.click_by(By.XPATH, "//a[@href='/products/create']")
-    selenium.find_by(By.XPATH, "//span[contains(.,'Item')]/../..//input").send_keys("Product")
-    selenium.find_by(By.XPATH, "//span[contains(.,'Price')]/../..//input").send_keys(100)
+
+def test_projects(selenium):
+    selenium.click_by(By.XPATH, "//span[.='Administration']")
+    selenium.click_by(By.XPATH, "//a[contains(.,'Projects')]")
+    selenium.click_by(By.XPATH, "//a[.='Create']")
+    selenium.find_by(By.ID, "project_edit_form_name").send_keys("project")
+    selenium.find_by(By.XPATH, '//label[.="Customer"]/..//div[contains(@class, "selectpicker")]').click()
+    selenium.find_by(By.XPATH, "//div[@id= 'project_edit_form_customer-ts-dropdown']/div[contains(.,'customer')]").click()
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
-    selenium.find_by(By.XPATH, "//h2[.='Edit Product']")
-    selenium.screenshot('product')
+    selenium.find_by(By.XPATH, "//span[contains(.,'project')]")
+    selenium.screenshot('projects')
 
-def test_payments(selenium):
-    selenium.click_by(By.XPATH, "//span[.='Payments']")
-    selenium.find_by(By.XPATH, "//h2[.='Payments']")
-
-def test_new_invoice(selenium):
-    selenium.click_by(By.XPATH, "//a[@href='/invoices/create']")
-    selenium.click_by(By.XPATH, "//button[.='New Client']/..//span[.='Client']")
-    #selenium.find_by(By.XPATH, "//input[@id='number']").send_keys("1234567891")
-    selenium.find_by(By.XPATH, "//span[.='Add Item']").click()
-    selenium.find_by(By.XPATH, "//span[contains(.,'Item')]/../../../../..//input").click()
-    selenium.find_by(By.XPATH, "//p[.='Product']").click()
+def test_activities(selenium):
+    selenium.click_by(By.XPATH, "//span[.='Administration']")
+    selenium.click_by(By.XPATH, "//a[contains(.,'Activities')]")
+    selenium.click_by(By.XPATH, "//a[.='Create']")
+    selenium.find_by(By.ID, "activity_edit_form_name").send_keys("activity")
+    selenium.find_by(By.XPATH, '//label[.="Project"]/..//div[contains(@class, "selectpicker")]').click()
+    selenium.find_by(By.XPATH, "//div[@id='activity_edit_form_project-ts-dropdown']//div[.='project']").click()
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
-    selenium.find_by(By.XPATH, "//div[contains(.,'Processing') and @role='status']")
-    selenium.invisible_by(By.XPATH, "//div[contains(.,'Processing') and @role='status']")
-    selenium.find_by(By.XPATH, "//button[.='Save']").click()
-    selenium.find_by(By.XPATH, "//h2[.='Edit Invoice']")
-    selenium.screenshot('invoice')
-
-
-def test_new_company(selenium):
-    selenium.click_by(By.XPATH, "//img[@alt='Company logo']")
-    selenium.find_by(By.XPATH, "//span[.='Add Company']").click()
-    selenium.find_by(By.XPATH, "//span[.='Yes']").click()
-    selenium.find_by(By.XPATH, "//label[contains(.,'Currency')]/..//input/..").click()
-    selenium.find_by(By.XPATH, "//div[.='Bermudian Dollar (BMD)']").click()
-    selenium.find_by(By.XPATH, "//label[contains(.,'Language')]/..//input/..").click()
-    selenium.screenshot('new-company-language')
-    selenium.find_by(By.XPATH, "//div[.='Albanian']").click()
-    selenium.find_by(By.XPATH, "//h3[.='Welcome to Invoice Ninja']")
-    selenium.screenshot('new-company')
-    selenium.find_by(By.XPATH, "//h3[.='Welcome to Invoice Ninja']/../../..//button[.='Save']").click()
-    selenium.invisible_by(By.XPATH, "//h3[.='Welcome to Invoice Ninja']")
-    selenium.screenshot('new-company-saved')
+    selenium.find_by(By.XPATH, "//span[contains(.,'activity')]")
+    selenium.screenshot('activities')
 
