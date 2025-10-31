@@ -64,7 +64,7 @@ def test_teams(selenium, device_user):
     selenium.screenshot('teams')
 
 
-def test_administration(selenium, device_user)
+def test_administration(selenium, device_user):
     selenium.click_by(By.XPATH, "//span[.='Administration']")
     selenium.screenshot('administration')
 
