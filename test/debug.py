@@ -26,6 +26,7 @@ def test_chrome():
     # options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     # options.set_capability('acceptInsecureCerts', True)
     # driver = webdriver.Remote(options=options)
+    driver.set_window_rect(0, 0, 2000, 3000)
     # driver.maximize_window()
 
     artifacts_dir = join(DIR, "artifact")
