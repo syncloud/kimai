@@ -12,7 +12,8 @@ monolog:
             channels: ["!deprecation"]
         syslog_handler:
             type: syslog
-            level: debug
+            ident: kimai
+            level: info
         console:
             type: console
             process_psr_3_messages: false
