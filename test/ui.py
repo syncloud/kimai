@@ -50,7 +50,7 @@ def test_welcome(selenium):
     selenium.find_by(By.XPATH, "//a[.='Next']").click()
 
 
-def test_teams(selenium, device_user):
+def test_system_teams(selenium, device_user):
     selenium.find_by(By.CLASS_NAME, "navbar-menu-system").click()
     selenium.find_by(By.CLASS_NAME, "navbar-menu-teams").click()
     selenium.find_by(By.XPATH, "//a[.='Create']").click()
@@ -59,16 +59,19 @@ def test_teams(selenium, device_user):
     selenium.find_by(By.XPATH, f'//div[contains(@class, "list-group-item") and contains(., "{device_user}")]').click()
     selenium.find_by(By.CLASS_NAME, 'form-selectgroup-check').click()
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
-    selenium.invisible_by(By.XPATH, "//h5[.=Create]")
+    selenium.invisible_by(By.XPATH, "//button[.='Save']")
     selenium.screenshot('teams')
 
 
-def test_administration(selenium, device_user):
-    selenium.click_by(By.XPATH, "//span[.='Administration']")
+def test_administration(selenium):
+    administration_xpath = "//a[contains(@class, 'navbar-menu-admin')]"
+    menu = selenium.find_by(By.XPATH, administration_xpath)
+    if "show" not in menu.get_attribute("class"):
+        selenium.click_by(By.XPATH, administration_xpath)
     selenium.screenshot('administration')
 
 
-def test_customers(selenium):
+def test_administration_customers(selenium):
     selenium.click_by(By.XPATH, "//a[contains(.,'Customers')]")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "customer_edit_form_name").send_keys("customer")
@@ -77,7 +80,7 @@ def test_customers(selenium):
     selenium.screenshot('customers')
 
 
-def test_projects(selenium):
+def test_administration_projects(selenium):
     selenium.click_by(By.XPATH, "//a[contains(.,'Projects')]")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "project_edit_form_name").send_keys("project")
@@ -87,7 +90,7 @@ def test_projects(selenium):
     selenium.find_by(By.XPATH, "//span[contains(.,'project')]")
     selenium.screenshot('projects')
 
-def test_activities(selenium):
+def test_administration_activities(selenium):
     selenium.click_by(By.XPATH, "//a[contains(.,'Activities')]")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "activity_edit_form_name").send_keys("activity")
@@ -96,4 +99,31 @@ def test_activities(selenium):
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
     selenium.find_by(By.XPATH, "//span[contains(.,'activity')]")
     selenium.screenshot('activities')
+
+def test_time_tracking_times(selenium):
+    selenium.click_by(By.XPATH, "//a[contains(.,'My times')]")
+    selenium.click_by(By.XPATH, "//a[.='Create']")
+    selenium.click_by(By.XPATH, "//label[contains(.,'Duration')]/..//div[contains(@class, 'duration-widget')]//button")
+    selenium.find_by(By.XPATH, '//a[.="1:00"]').click()
+    selenium.find_by(By.XPATH, "//label[.='Project']/..//div[contains(@class, 'selectpicker')]").click()
+    selenium.find_by(By.XPATH, "//div[@id='timesheet_edit_form_project-ts-dropdown']//div[.='project']").click()
+    selenium.click_by(By.XPATH, "//label[.='Activity']/..//div[contains(@class, 'selectpicker')]")
+    selenium.find_by(By.XPATH, "//div[@id='timesheet_edit_form_activity-ts-dropdown']//div[.='activity']").click()
+    selenium.find_by(By.XPATH, "//button[.='Save']").click()
+    selenium.invisible_by(By.XPATH, "//h5[.=Create]")
+    selenium.find_by(By.XPATH, "//p[contains(.,'Show entries 1')]")
+    selenium.screenshot('times')
+
+def test_invoices(selenium):
+    xpath = "//a[contains(.,'Invoices')]"
+    menu = selenium.find_by(By.XPATH, xpath)
+    if "show" not in menu.get_attribute("class"):
+        selenium.click_by(By.XPATH, xpath)
+    selenium.screenshot('invoices')
+
+def test_invoices_create(selenium):
+    selenium.click_by(By.XPATH, "//a[contains(.,'Create invoice')]")
+    selenium.click_by(By.XPATH, "//button[.='Search']")
+    selenium.find_by(By.XPATH, "//span[contains(.,'customer')]")
+    selenium.screenshot('invoice')
 
