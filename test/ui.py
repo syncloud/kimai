@@ -32,7 +32,7 @@ def test_start(module_setup, app, domain, device_host):
     add_host_alias(app, device_host, domain)
 
 
-def test_login_new(selenium, device_user, device_password):
+def test_login(selenium, device_user, device_password):
     selenium.open_app()
     selenium.find_by(By.ID, "username").send_keys(device_user)
     password = selenium.find_by(By.ID, "password")
@@ -59,44 +59,52 @@ def test_system_teams(selenium, device_user):
     selenium.find_by(By.XPATH, f'//div[contains(@class, "list-group-item") and contains(., "{device_user}")]').click()
     selenium.find_by(By.CLASS_NAME, 'form-selectgroup-check').click()
     selenium.find_by(By.XPATH, "//button[.='Save']").click()
+    selenium.invisible_by(By.XPATH, "//h3[.='Create']")
     selenium.invisible_by(By.XPATH, "//button[.='Save']")
     selenium.screenshot('teams')
 
 
-def test_administration(selenium):
-    administration_xpath = "//a[contains(@class, 'navbar-menu-admin')]"
-    menu = selenium.find_by(By.XPATH, administration_xpath)
+def menu_administration(selenium, item):
+    selenium.clickable_by(By.XPATH, "//li[@id='admin']")
+    menu = selenium.find_by(By.XPATH, "//li[@id='admin']/div")
     if "show" not in menu.get_attribute("class"):
-        selenium.click_by(By.XPATH, administration_xpath)
+        selenium.click_by(By.XPATH, "//li[@id='admin']")
+    selenium.click_by(By.XPATH, f"//a[contains(.,'{item}')]")
     selenium.screenshot('administration')
 
 
 def test_administration_customers(selenium):
-    selenium.click_by(By.XPATH, "//a[contains(.,'Customers')]")
+    menu_administration(selenium, "Customers")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "customer_edit_form_name").send_keys("customer")
     selenium.click_by(By.XPATH, "//button[.='Save']")
+    selenium.invisible_by(By.XPATH, "//h3[.='Create']")
+    selenium.invisible_by(By.XPATH, "//button[.='Save']")
     selenium.find_by(By.XPATH, "//span[contains(.,'customer')]")
     selenium.screenshot('customers')
 
 
 def test_administration_projects(selenium):
-    selenium.click_by(By.XPATH, "//a[contains(.,'Projects')]")
+    menu_administration(selenium, "Projects")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "project_edit_form_name").send_keys("project")
     selenium.click_by(By.XPATH, '//label[.="Customer"]/..//div[contains(@class, "selectpicker")]')
     selenium.click_by(By.XPATH, "//div[@id= 'project_edit_form_customer-ts-dropdown']/div[contains(.,'customer')]")
     selenium.click_by(By.XPATH, "//button[.='Save']")
+    selenium.invisible_by(By.XPATH, "//h3[.='Create']")
+    selenium.invisible_by(By.XPATH, "//button[.='Save']")
     selenium.find_by(By.XPATH, "//span[contains(.,'project')]")
     selenium.screenshot('projects')
 
 def test_administration_activities(selenium):
-    selenium.click_by(By.XPATH, "//a[contains(.,'Activities')]")
+    menu_administration(selenium, "Activities")
     selenium.click_by(By.XPATH, "//a[.='Create']")
     selenium.find_by(By.ID, "activity_edit_form_name").send_keys("activity")
     selenium.click_by(By.XPATH, '//label[.="Project"]/..//div[contains(@class, "selectpicker")]')
     selenium.click_by(By.XPATH, "//div[@id='activity_edit_form_project-ts-dropdown']//div[.='project']")
     selenium.click_by(By.XPATH, "//button[.='Save']")
+    selenium.invisible_by(By.XPATH, "//h3[.='Create']")
+    selenium.invisible_by(By.XPATH, "//button[.='Save']")
     selenium.find_by(By.XPATH, "//span[contains(.,'activity')]")
     selenium.screenshot('activities')
 
@@ -120,6 +128,16 @@ def test_invoices(selenium):
     if "show" not in menu.get_attribute("class"):
         selenium.click_by(By.XPATH, xpath)
     selenium.screenshot('invoices')
+
+def test_invoices_template(selenium):
+    selenium.click_by(By.XPATH, "//a[contains(.,'Invoice template')]")
+    selenium.click_by(By.XPATH, "//a[.='Create']")
+    selenium.find_by(By.XPATH, "//button[.='Save']")
+    selenium.find_by(By.ID, "invoice_template_form_name").send_keys("invoice-name")
+    selenium.find_by(By.ID, "invoice_template_form_title").send_keys("invoice-title")
+    selenium.find_by(By.ID, "invoice_template_form_company").send_keys("invoice-company")
+    selenium.click_by(By.XPATH, "//button[.='Save']")
+    selenium.find_by(By.XPATH, "//td[.='invoice-name']")
 
 def test_invoices_create(selenium):
     selenium.click_by(By.XPATH, "//a[contains(.,'Create invoice')]")
