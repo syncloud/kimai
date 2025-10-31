@@ -1,8 +1,3 @@
-monolog:
-  handlers:
-    main:
-      path: php://stderr 
-
 kimai:
     data_dir: "{{ .DataDir }}/data"
 
