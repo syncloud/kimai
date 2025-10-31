@@ -1,9 +1,10 @@
 package installer
 
 import (
-	"go.uber.org/zap"
 	"os/exec"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 type Executor struct {

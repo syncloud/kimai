@@ -3,10 +3,11 @@ package installer
 import (
 	"errors"
 	"fmt"
-	"go.uber.org/zap"
 	"os"
 	"os/exec"
 	"path"
+
+	"go.uber.org/zap"
 )
 
 type Database struct {
@@ -114,33 +115,6 @@ func (d *Database) createDb() error {
 		return err
 	}
 	err = d.Execute("FLUSH PRIVILEGES")
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (d *Database) ActivatePremium(email string) error {
-	err := d.ExecuteDb(d.name,
-		fmt.Sprintf(""+
-			"INSERT INTO user_roles (role_uuid , user_uuid) VALUES ("+
-			" (SELECT uuid FROM roles WHERE name=\"PRO_USER\" ORDER BY version DESC limit 1),"+
-			" (SELECT uuid FROM users WHERE email=\"%s\")"+
-			") ON DUPLICATE KEY UPDATE role_uuid = VALUES(role_uuid)", email))
-	if err != nil {
-		return err
-	}
-	err = d.ExecuteDb(d.name,
-		fmt.Sprintf(""+
-			"INSERT INTO user_subscriptions SET "+
-			"uuid=UUID(), "+
-			"plan_name=\"PRO_PLAN\", "+
-			"ends_at=8640000000000000, "+
-			"created_at=0, "+
-			"updated_at=0, "+
-			"user_uuid=(SELECT uuid FROM users WHERE email=\"%s\"), "+
-			"subscription_id=1,"+
-			" subscription_type=\"regular\"", email))
 	if err != nil {
 		return err
 	}

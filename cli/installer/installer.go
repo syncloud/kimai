@@ -2,13 +2,16 @@ package installer
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"strings"
+
+	"github.com/google/uuid"
 	cp "github.com/otiai10/copy"
 	"github.com/syncloud/golib/config"
 	"github.com/syncloud/golib/linux"
 	"github.com/syncloud/golib/platform"
 	"go.uber.org/zap"
-	"os"
-	"path"
 )
 
 const App = "kimai"
@@ -20,7 +23,9 @@ type Variables struct {
 	CommonDir string
 	AppKey    string
 	AppUrl    string
+	AppDomain string
 	Domain    string
+	Secret    string
 }
 
 type Installer struct {
@@ -240,7 +245,17 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
-	domain, err := i.platformClient.GetAppDomainName(App)
+	appDomain, err := i.platformClient.GetAppDomainName(App)
+	if err != nil {
+		return err
+	}
+
+	domain, found := strings.CutPrefix(appDomain, App)
+	if !found {
+		return fmt.Errorf("%s is not in %s", App, appDomain)
+	}
+
+	secret, err := getOrCreateUuid(path.Join(i.dataDir, ".secret"))
 	if err != nil {
 		return err
 	}
@@ -251,7 +266,9 @@ func (i *Installer) UpdateConfigs() error {
 		DataDir:   i.dataDir,
 		CommonDir: i.commonDir,
 		AppUrl:    appUrl,
+		AppDomain: appDomain,
 		Domain:    domain,
+		Secret:    secret,
 	}
 
 	err = config.Generate(
@@ -292,4 +309,18 @@ func (i *Installer) FixPermissions() error {
 		return err
 	}
 	return nil
+}
+
+func getOrCreateUuid(file string) (string, error) {
+	_, err := os.Stat(file)
+	if os.IsNotExist(err) {
+		secret := uuid.New().String()
+		err = os.WriteFile(file, []byte(secret), 0644)
+		return secret, err
+	}
+	content, err := os.ReadFile(file)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
 }
