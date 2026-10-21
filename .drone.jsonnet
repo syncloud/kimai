@@ -1,6 +1,6 @@
 local name = 'kimai';
 local version = '2.40.0';
-local php = '8.3.9-fpm-bullseye';
+local php = '8.3.36-fpm-bookworm';
 local nginx = '1.24.0';
 local mariadb = '10.5.16-alpine';
 local debian = 'bookworm-slim';
