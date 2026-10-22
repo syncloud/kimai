@@ -14,4 +14,6 @@ export PLAYWRIGHT_ARTIFACT_DIR=/drone/src/artifact/screenshots
 ${DIR}/../../apt.sh curl
 npm ci --no-audit --no-fund
 ${DIR}/wait-app.sh kimai.${PLAYWRIGHT_DOMAIN}
-npx playwright test --project=${PLAYWRIGHT_PROJECT} "$SPEC"
+getent ahostsv6 kimai.${PLAYWRIGHT_DOMAIN} || true
+curl -6 -sk -o /dev/null -w "ipv6: %{http_code} %{remote_ip}\n" https://kimai.${PLAYWRIGHT_DOMAIN} || true
+PLAYWRIGHT_NETLOG=/drone/src/artifact/screenshots/netlog.json npx playwright test --project=${PLAYWRIGHT_PROJECT} "$SPEC"

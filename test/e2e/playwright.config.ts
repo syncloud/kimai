@@ -15,6 +15,7 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
     actionTimeout: 60_000,
     navigationTimeout: 120_000,
+    launchOptions: { args: process.env.PLAYWRIGHT_NETLOG ? [`--log-net-log=${process.env.PLAYWRIGHT_NETLOG}`, '--net-log-capture-mode=Everything'] : [] },
   },
   projects: [
     {
