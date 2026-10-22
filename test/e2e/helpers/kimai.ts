@@ -68,7 +68,7 @@ export async function administration(page: Page, item: string) {
 }
 
 export async function expandMenu(page: Page, name: string) {
-  const link = page.getByRole('link', { name }).first()
+  const link = page.locator('a', { hasText: name }).first()
   await expect(link).toBeVisible()
   if (!((await link.getAttribute('class')) ?? '').includes('show')) {
     await link.click()
