@@ -12,6 +12,6 @@ export PLAYWRIGHT_PROJECT=desktop
 export PLAYWRIGHT_ARTIFACT_DIR=/drone/src/artifact/screenshots
 
 ${DIR}/../../apt.sh curl
-${DIR}/wait-app.sh kimai.${PLAYWRIGHT_DOMAIN}
 npm ci --no-audit --no-fund
+${DIR}/wait-app.sh kimai.${PLAYWRIGHT_DOMAIN}
 npx playwright test --project=${PLAYWRIGHT_PROJECT} "$SPEC"
