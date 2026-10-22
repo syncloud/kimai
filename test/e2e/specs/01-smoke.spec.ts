@@ -49,7 +49,7 @@ test('device user tracks time and invoices a customer', async ({ page }) => {
     await create(page)
     await page.locator('#customer_edit_form_name').fill(customer)
     await save(page)
-    await expect(page.getByText(customer).first()).toBeVisible()
+    await expect(page.getByText(customer).filter({ visible: true }).first()).toBeVisible()
     await shoot(page, 'customers')
   })
 
@@ -107,7 +107,7 @@ test('device user tracks time and invoices a customer', async ({ page }) => {
   await test.step('create invoice', async () => {
     await page.getByRole('link', { name: 'Create invoice' }).click()
     await page.getByRole('button', { name: label('Search') }).click()
-    await expect(page.getByText(customer).first()).toBeVisible()
+    await expect(page.getByText(customer).filter({ visible: true }).first()).toBeVisible()
     await shoot(page, 'invoice')
   })
 })
