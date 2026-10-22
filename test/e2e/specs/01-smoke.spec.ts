@@ -11,6 +11,7 @@ import {
   save,
   selectpicker,
   systemMenu,
+  label,
 } from '../helpers/kimai'
 
 test('device user tracks time and invoices a customer', async ({ page }) => {
@@ -105,7 +106,7 @@ test('device user tracks time and invoices a customer', async ({ page }) => {
 
   await test.step('create invoice', async () => {
     await page.getByRole('link', { name: 'Create invoice' }).click()
-    await page.getByRole('button', { name: 'Search', exact: true }).click()
+    await page.getByRole('button', { name: label('Search') }).click()
     await expect(page.getByText(customer).first()).toBeVisible()
     await shoot(page, 'invoice')
   })

@@ -1,6 +1,10 @@
 import { Locator, Page, expect } from '@playwright/test'
 import { shoot } from './screenshot'
 
+export function label(text: string): RegExp {
+  return new RegExp(`(^|\\W)${text}$`)
+}
+
 export function systemMenu(page: Page): Locator {
   return page.locator('.navbar-menu-system')
 }
@@ -43,12 +47,12 @@ export async function choose(page: Page, label: string, dropdown: string, option
 }
 
 export async function create(page: Page) {
-  await page.getByRole('link', { name: 'Create', exact: true }).click()
-  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeVisible()
+  await page.getByRole('link', { name: label('Create') }).click()
+  await expect(page.getByRole('button', { name: label('Save') })).toBeVisible()
 }
 
 export async function save(page: Page) {
-  const button = page.getByRole('button', { name: 'Save', exact: true })
+  const button = page.getByRole('button', { name: label('Save') })
   await button.click()
   await expect(button).toBeHidden()
 }
