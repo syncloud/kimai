@@ -100,7 +100,7 @@ test('device user tracks time and invoices a customer', async ({ page }) => {
     await page.locator('#invoice_template_form_title').fill('invoice-title')
     await page.locator('#invoice_template_form_company').fill('invoice-company')
     await save(page)
-    await expect(page.getByRole('cell', { name: template, exact: true })).toBeVisible()
+    await expect(page.getByText(template, { exact: true })).toBeVisible()
     await shoot(page, 'invoice-template')
   })
 
