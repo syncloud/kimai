@@ -41,9 +41,9 @@ export function selectpicker(page: Page, label: string): Locator {
     .locator('div.selectpicker')
 }
 
-export async function choose(page: Page, label: string, dropdown: string, option: string) {
-  await selectpicker(page, label).click()
-  await page.locator(`#${dropdown}-ts-dropdown`).getByRole('option', { name: option }).click()
+export async function choose(page: Page, field: string, option: string) {
+  await page.locator(`#${field}-ts-control`).click()
+  await page.locator(`#${field}-ts-dropdown`).getByRole('option', { name: option }).click()
 }
 
 export async function create(page: Page) {
