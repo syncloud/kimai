@@ -1,18 +1,17 @@
 local name = 'kimai';
 local version = '2.40.0';
-local php = '8.3.9-fpm-bullseye';
+local php = '8.3.36-fpm-bookworm';
 local nginx = '1.24.0';
 local mariadb = '10.5.16-alpine';
 local debian = 'bookworm-slim';
-local browser = 'chrome';
-local platform = '25.09';
-local selenium = '4.35.0-20250828';
+local platform = '26.04.10';
+local playwright = 'mcr.microsoft.com/playwright:v1.59.1-jammy';
 local store_publisher = 'stable-346';
 local python = '3.12-slim-bookworm';
 local distro_default = 'bookworm';
 local distros = ['bookworm'];
 
-local build(arch, test_ui, dind) = [
+local build(arch, test_ui) = [
 {
   kind: 'pipeline',
   type: 'docker',
@@ -23,18 +22,10 @@ local build(arch, test_ui, dind) = [
   },
   steps: [
            {
-             name: 'version',
-             image: "debian:" + debian,
-             commands: [
-               'echo $DRONE_BUILD_NUMBER > version',
-             ],
-           },
-           {
              name: 'php',
              image: 'php:' + php,
              commands: [
-               './php/build.sh',
-               './php/build-server.sh ' + version,
+               './php/build.sh ' + version,
              ],
            },
            {
@@ -42,7 +33,6 @@ local build(arch, test_ui, dind) = [
              image: 'syncloud/platform-' + distro_default + '-' + arch + ':' + platform,
              commands: [
                './php/test.sh',
-               './php/test-server.sh',
              ],
            },
            {
@@ -77,20 +67,14 @@ local build(arch, test_ui, dind) = [
              name: 'cli',
              image: 'golang:1.23',
              commands: [
-               'cd cli',
-               'CGO_ENABLED=0 go build -o ../build/snap/meta/hooks/install ./cmd/install',
-               'CGO_ENABLED=0 go build -o ../build/snap/meta/hooks/configure ./cmd/configure',
-               'CGO_ENABLED=0 go build -o ../build/snap/meta/hooks/pre-refresh ./cmd/pre-refresh',
-               'CGO_ENABLED=0 go build -o ../build/snap/meta/hooks/post-refresh ./cmd/post-refresh',
-               'CGO_ENABLED=0 go build -o ../build/snap/bin/cli ./cmd/cli',
+               './cli/build.sh',
              ],
            },
            {
              name: 'package',
              image: "debian:" + debian,
              commands: [
-               'VERSION=$(cat version)',
-               './package.sh ' + name + ' $VERSION ',
+               './package.sh ' + name + ' $DRONE_BUILD_NUMBER',
              ],
            },
          ] + [
@@ -98,85 +82,27 @@ local build(arch, test_ui, dind) = [
              name: 'test ' + distro,
              image: 'python:' + python,
              commands: [
-               'cd test',
-               './deps.sh',
-                'py.test -x -s test.py --distro=' + distro + ' --ver=$DRONE_BUILD_NUMBER --app=' + name,
+               './ci/test.sh test.py ' + distro + ' ' + name,
              ],
            }
            for distro in distros
-         ] + (if test_ui then (
-                [
-                  {
-                    name: 'selenium',
-                    image: 'selenium/standalone-' + browser + ':' + selenium,
-                    detach: true,
-                    environment: {
-                      SE_NODE_SESSION_TIMEOUT: '999999',
-                      START_XVFB: 'true',
-                    },
-                    volumes: [{
-                      name: 'shm',
-                      path: '/dev/shm',
-                    }],
-                    commands: [
-                      'cat /etc/hosts',
-                      'DOMAIN="' + distro_default + '.com"',
-                      'APP_DOMAIN="' + name + '.' + distro_default + '.com"',
-                      'getent hosts $APP_DOMAIN | sed "s/$APP_DOMAIN/auth.$DOMAIN/g" | sudo tee -a /etc/hosts',
-                      'cat /etc/hosts',
-                      '/opt/bin/entry_point.sh',
-                    ],
-                  },
-
-                  {
-                    name: 'selenium-video',
-                    image: 'selenium/video:ffmpeg-6.1.1-20240621',
-                    detach: true,
-                    environment: {
-                      DISPLAY_CONTAINER_NAME: 'selenium',
-                      FILE_NAME: 'video.mkv',
-                    },
-                    volumes: [
-                      {
-                        name: 'shm',
-                        path: '/dev/shm',
-                      },
-                      {
-                        name: 'videos',
-                        path: '/videos',
-                      },
-                    ],
-                  },
-                  {
-                    name: 'test-ui',
-                    image: 'python:' + python,
-                    commands: [
-                      'cd test',
-                      './deps.sh',
-                       'py.test -x -s ui.py --distro=' + distro_default + ' --ver=$DRONE_BUILD_NUMBER --app=' + name + ' --browser=' + browser,
-                    ],
-                    volumes: [{
-                      name: 'videos',
-                      path: '/videos',
-                    }],
-                  },
-                ]
-              )
-              else []) +
+         ] + (if test_ui then [
+                {
+                  name: 'e2e',
+                  image: playwright,
+                  commands: [
+                    './test/e2e/run.sh specs/01-smoke.spec.ts',
+                  ],
+                },
+              ] else []) +
          (if arch == 'amd64' then [
             {
               name: 'test-upgrade',
               image: 'python:' + python,
               commands: [
-                'cd test',
-                './deps.sh',
-                 'py.test -x -s upgrade.py --distro=' + distro_default + ' --ver=$DRONE_BUILD_NUMBER --app=' + name + ' --browser=' + browser,
+                './ci/test.sh upgrade.py ' + distro_default + ' ' + name,
               ],
               privileged: true,
-              volumes: [{
-                name: 'videos',
-                path: '/videos',
-              }],
             },
           ] else []) + [
     {
@@ -221,18 +147,6 @@ local build(arch, test_ui, dind) = [
   },
   services: [
     {
-      name: 'docker',
-      image: 'docker:' + dind,
-      privileged: true,
-      volumes: [
-        {
-          name: 'dockersock',
-          path: '/var/run',
-        },
-      ],
-    },
-  ] + [
-    {
       name: name + '.' + distro + '.com',
       image: 'syncloud/platform-' + distro + '-' + arch + ':' + platform,
       privileged: true,
@@ -262,21 +176,9 @@ local build(arch, test_ui, dind) = [
         path: '/dev',
       },
     },
-    {
-      name: 'shm',
-      temp: {},
-    },
-    {
-      name: 'videos',
-      temp: {},
-    },
-    {
-      name: 'dockersock',
-      temp: {},
-    },
   ],
 }];
 
-build('amd64', true, '20.10.21-dind') +
-build('arm64', false, '20.10.21-dind')
+build('amd64', true) +
+build('arm64', false)
 

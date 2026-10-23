@@ -8,6 +8,6 @@ MAGICK_CODER_MODULE_PATH=$(echo ${DIR}/usr/lib/ImageMagickCoders) \
   PHP_INI_SCAN_DIR=${DIR}/usr/local/etc/php:${DIR}/usr/local/etc/php/conf.d \
   COMPOSER_MEMORY_LIMIT=-1 \
   memory_limit=512M \
-  ${DIR}/lib/*-linux*/ld-*.so \
+  ${DIR}/lib/*-linux*/ld-linux-*.so* \
   --library-path $LIBS \
   ${DIR}/usr/local/bin/php "$@"
