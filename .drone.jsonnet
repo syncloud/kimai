@@ -1,19 +1,20 @@
 local name = 'kimai';
-local version = '2.40.0';
+local version = '2.73.0';
 local php = '8.3.36-fpm-bookworm';
 local nginx = '1.30.7';
 local mariadb = '10.5.16-alpine';
+local golang = '1.25';
 local debian = 'bookworm-slim';
-local platform = '26.08.01';
+local platform = '26.10.02';
 local platform_image(distro) = 'syncloud/platform-' + distro + ':' + platform;
+local snapd_hold = "mkdir -p /etc/systemd/system/snapd.service.d && printf '[Service]\\nExecStartPost=/bin/sh -c \"/usr/bin/snap set system refresh.hold=2099-01-01T00:00:00Z\"\\n' > /etc/systemd/system/snapd.service.d/disable-refresh.conf && exec /sbin/init";
 local playwright = 'mcr.microsoft.com/playwright:v1.59.1-jammy';
 local store_publisher = 'stable-346';
 local python = '3.12-slim-bookworm';
-local distro_default = 'bookworm';
-local distros = ['bookworm'];
+local distro_default = 'buster';
+local distros = ['bookworm', 'buster'];
 
-local build(arch, test_ui) = [
-{
+local build(arch, test_ui) = [{
   kind: 'pipeline',
   type: 'docker',
   name: arch,
@@ -30,24 +31,10 @@ local build(arch, test_ui) = [
              ],
            },
            {
-             name: 'php test',
-             image: platform_image(distro_default),
-             commands: [
-               './php/test.sh',
-             ],
-           },
-           {
              name: 'nginx',
              image: 'nginx:' + nginx,
              commands: [
                './nginx/build.sh',
-             ],
-           },
-           {
-             name: 'nginx test',
-             image: platform_image(distro_default),
-             commands: [
-               './nginx/test.sh',
              ],
            },
            {
@@ -58,22 +45,26 @@ local build(arch, test_ui) = [
              ],
            },
            {
-             name: 'mariadb test',
-             image: platform_image(distro_default),
-             commands: [
-               './mariadb/test.sh',
-             ],
-           },
-           {
              name: 'cli',
-             image: 'golang:1.23',
+             image: 'golang:' + golang,
              commands: [
                './cli/build.sh',
              ],
            },
+         ] + [
+           {
+             name: component + ' test ' + distro,
+             image: platform_image(distro),
+             commands: [
+               './' + component + '/test.sh',
+             ],
+           }
+           for component in ['php', 'nginx', 'mariadb', 'cli']
+           for distro in distros
+         ] + [
            {
              name: 'package',
-             image: "debian:" + debian,
+             image: 'debian:' + debian,
              commands: [
                './package.sh ' + name + ' $DRONE_BUILD_NUMBER',
              ],
@@ -95,17 +86,35 @@ local build(arch, test_ui) = [
                     './test/e2e/run.sh specs/01-smoke.spec.ts',
                   ],
                 },
-              ] else []) +
-         (if arch == 'amd64' then [
-            {
-              name: 'test-upgrade',
-              image: 'python:' + python,
-              commands: [
-                './ci/test.sh upgrade.py ' + distro_default + ' ' + name,
-              ],
-              privileged: true,
-            },
-          ] else []) + [
+                {
+                  name: 'test-upgrade-prev',
+                  image: 'python:' + python,
+                  commands: [
+                    './ci/test.sh upgrade_prev.py ' + distro_default + ' ' + name,
+                  ],
+                },
+                {
+                  name: 'e2e-before-upgrade',
+                  image: playwright,
+                  commands: [
+                    './test/e2e/run.sh specs/02-pre-upgrade.spec.ts',
+                  ],
+                },
+                {
+                  name: 'test-upgrade',
+                  image: 'python:' + python,
+                  commands: [
+                    './ci/test.sh upgrade.py ' + distro_default + ' ' + name,
+                  ],
+                },
+                {
+                  name: 'e2e-after-upgrade',
+                  image: playwright,
+                  commands: [
+                    './test/e2e/run.sh specs/03-post-upgrade.spec.ts',
+                  ],
+                },
+              ] else []) + [
     {
       name: 'publish',
       image: 'syncloud/store-publisher:' + store_publisher,
@@ -150,6 +159,7 @@ local build(arch, test_ui) = [
     {
       name: name + '.' + distro + '.com',
       image: platform_image(distro),
+      entrypoint: ['/bin/sh', '-c', snapd_hold],
       privileged: true,
       volumes: [
         {

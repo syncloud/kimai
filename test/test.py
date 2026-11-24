@@ -1,12 +1,14 @@
 import os
-import shutil
 from os.path import dirname, join
 from subprocess import check_output
 
 import pytest
 import requests
+from syncloudlib.http import wait_for_rest
 from syncloudlib.integration.hosts import add_host_alias
 from syncloudlib.integration.installer import local_install, wait_for_installer
+
+import snapd
 
 DIR = dirname(__file__)
 TMP_DIR = '/tmp/syncloud'
@@ -29,12 +31,11 @@ def module_setup(request, device, data_dir, platform_data_dir, app_dir, artifact
         device.run_ssh('ls -la /snap > {0}/snap.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la {0}/ > {1}/app.ls.log'.format(app_dir, TMP_DIR), throw=False)    
         device.run_ssh('ls -la {0}/ > {1}/data.ls.log'.format(data_dir, TMP_DIR), throw=False)    
-        device.run_ssh('ls -la {0}/log/ > {1}/log.ls.log'.format(data_dir, TMP_DIR), throw=False)  
-  
+        device.run_ssh('systemctl status snap.kimai.* > {0}/systemctl.status.log'.format(TMP_DIR), throw=False)
+
         app_log_dir = join(artifact_dir, 'log')
         os.mkdir(app_log_dir)
-        device.scp_from_device('{0}/log/*.log'.format(data_dir), app_log_dir)
-        device.scp_from_device('{0}/*'.format(TMP_DIR), app_log_dir)
+        device.scp_from_device('{0}/*'.format(TMP_DIR), app_log_dir, throw=False)
         check_output('cp /etc/hosts {0}/hosts.log'.format(artifact_dir), shell=True)
         check_output('chmod -R a+r {0}'.format(artifact_dir), shell=True)
     request.addfinalizer(module_teardown)
@@ -42,7 +43,8 @@ def module_setup(request, device, data_dir, platform_data_dir, app_dir, artifact
 
 def test_start(module_setup, device, device_host, app, domain):
     add_host_alias(app, device_host, domain)
-    device.run_ssh('date', retries=10)
+    device.run_ssh('date', retries=100)
+    snapd.settle(device)
     device.run_ssh('mkdir {0}'.format(TMP_DIR))
 
 
@@ -51,9 +53,11 @@ def test_activate_device(device):
     assert response.status_code == 200, response.text
 
 
-def test_install(app_archive_path, domain, device_session, device_password):
+def test_install(app_archive_path, domain, device_session, device_password, app_domain, device, app):
     local_install(domain, device_password, app_archive_path)
     wait_for_installer(device_session, domain, attempts=10)
+    wait_for_rest(requests.session(), 'https://{0}/en/login'.format(app_domain), 200, 100)
+    snapd.assert_no_restarts(device, app)
 
 
 def test_php(device):
@@ -78,8 +82,10 @@ def test_access_change_event(device):
     device.run_ssh('snap run kimai.access-change > {0}/access-change.log'.format(TMP_DIR))
 
 
-def test_upgrade(app_archive_path, domain, device_password):
+def test_upgrade(app_archive_path, domain, device_password, app_domain, device, app):
     local_install(domain, device_password, app_archive_path)
+    wait_for_rest(requests.session(), 'https://{0}/en/login'.format(app_domain), 200, 100)
+    snapd.assert_no_restarts(device, app)
 
 
 def test_remove(device, app):
@@ -87,5 +93,7 @@ def test_remove(device, app):
     assert response.status_code == 200, response.text
 
 
-def test_reinstall(app_archive_path, domain, device_password):
+def test_reinstall(app_archive_path, domain, device_password, app_domain, device, app):
     local_install(domain, device_password, app_archive_path)
+    wait_for_rest(requests.session(), 'https://{0}/en/login'.format(app_domain), 200, 100)
+    snapd.assert_no_restarts(device, app)

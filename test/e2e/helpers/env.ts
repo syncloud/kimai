@@ -1,5 +1,5 @@
-export function env(name: string, fallback?: string): string {
-  const value = process.env[name] ?? fallback
+export function env(name: string): string {
+  const value = process.env[name]
   if (!value) {
     throw new Error(`${name} is not set`)
   }
