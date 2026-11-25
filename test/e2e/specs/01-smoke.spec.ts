@@ -15,8 +15,8 @@ import {
 } from '../helpers/kimai'
 
 test('device user tracks time and invoices a customer', async ({ page }) => {
-  const user = env('PLAYWRIGHT_DEVICE_USER', 'user')
-  const password = env('PLAYWRIGHT_DEVICE_PASSWORD', 'Password1')
+  const user = env('PLAYWRIGHT_DEVICE_USER')
+  const password = env('PLAYWRIGHT_DEVICE_PASSWORD')
   const run = Date.now().toString(36)
   const team = `team-${run}`
   const customer = `customer-${run}`
@@ -98,7 +98,7 @@ test('device user tracks time and invoices a customer', async ({ page }) => {
     await create(page)
     await page.locator('#invoice_template_form_name').fill(template)
     await page.locator('#invoice_template_form_title').fill('invoice-title')
-    await page.locator('#invoice_template_form_company').fill('invoice-company')
+    await choose(page, 'invoice_template_form_customer', customer)
     await save(page)
     await expect(page.getByText(template, { exact: true })).toBeVisible()
     await shoot(page, 'invoice-template')

@@ -250,7 +250,7 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
-	domain, found := strings.CutPrefix(appDomain, App)
+	domain, found := strings.CutPrefix(appDomain, App+".")
 	if !found {
 		return fmt.Errorf("%s is not in %s", App, appDomain)
 	}

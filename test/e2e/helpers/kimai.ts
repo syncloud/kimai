@@ -9,15 +9,15 @@ export function systemMenu(page: Page): Locator {
   return page.locator('.navbar-menu-system')
 }
 
-export async function login(page: Page, user: string, password: string) {
+export async function login(page: Page, user: string, password: string, prefix = '') {
   await page.goto('/')
   await page.locator('#username').fill(user)
   await page.locator('#password').fill(password)
-  await shoot(page, 'login')
+  await shoot(page, `${prefix}login`)
   await page.getByRole('button', { name: 'Log in' }).click()
 }
 
-export async function completeWizard(page: Page) {
+export async function completeWizard(page: Page, prefix = '') {
   const next = page.getByRole('link', { name: 'Next', exact: true })
   await expect(next.or(systemMenu(page)).first()).toBeVisible()
   if (!(await next.isVisible())) {
@@ -25,10 +25,10 @@ export async function completeWizard(page: Page) {
   }
   await next.click()
   await expect(page.getByRole('heading', { name: 'Your profile' })).toBeVisible()
-  await shoot(page, 'welcome')
+  await shoot(page, `${prefix}welcome`)
   await page.getByRole('button', { name: 'Next', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Congratulations' })).toBeVisible()
-  await shoot(page, 'congratulations')
+  await shoot(page, `${prefix}congratulations`)
   await page.getByRole('link', { name: 'Next', exact: true }).click()
   await expect(systemMenu(page)).toBeVisible()
 }
@@ -73,4 +73,9 @@ export async function expandMenu(page: Page, name: string) {
   if (!((await link.getAttribute('class')) ?? '').includes('show')) {
     await link.click()
   }
+}
+
+export async function customers(page: Page) {
+  await administration(page, 'Customers')
+  await expect(page.getByRole('link', { name: label('Create') })).toBeVisible()
 }

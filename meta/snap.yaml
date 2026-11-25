@@ -1,33 +1,34 @@
+name: kimai
+summary: Kimai
+description: Time tracking for project-driven teams
+grade: stable
+
 apps:
+  mariadb:
+    user: kimai
+    command: bin/service.mariadb.sh
+    daemon: simple
+    restart-condition: always
+    start-timeout: 600s
+    restart-delay: 10s
+    before: [server]
 
   server:
     user: kimai
     command: bin/service.php-fpm.sh
     daemon: simple
-    plugs:
-    - network
-    - network-bind
+    restart-condition: always
     start-timeout: 600s
-    restart-condition: always
-
-  mariadb:
-    user: kimai
-    command: bin/service.mariadb.sh
-    daemon: simple
-    plugs:
-    - network
-    - network-bind
-    restart-condition: always
+    restart-delay: 10s
+    before: [nginx]
 
   nginx:
     user: kimai
     command: bin/service.nginx.sh
     daemon: simple
-    plugs:
-    - network
-    - network-bind
     restart-condition: always
     start-timeout: 600s
+    restart-delay: 10s
 
   cli:
     command: bin/cli
@@ -55,9 +56,3 @@ apps:
 
   restore-post-start:
     command: bin/cli restore-post-start
-
-confinement: strict
-description: Time tracking for project-driven teams
-grade: stable
-name: kimai
-summary: Kimai
